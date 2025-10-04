@@ -1,0 +1,13 @@
+{
+    "name": "soup/postgers-php",
+    "description": "This is a pet-project to get to know Postgres and PHP PDO better.",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Soup\\PostgersPhp\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.4"
+    }
+}

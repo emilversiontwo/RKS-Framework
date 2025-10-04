@@ -1,0 +1,33 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  DOCKER_COMPOSE: "docker-compose.yaml"
+
+tasks:
+  composer:
+    desc: example= task composer -- i
+    cmds:
+      - docker compose --file {{.DOCKER_COMPOSE}} exec app composer {{.CLI_ARGS}}
+    silent: true
+
+  setup:
+    desc: Use on first launch
+    silent: true
+    cmds:
+      - cp -n .env.example .env
+      - docker compose --file {{.DOCKER_COMPOSE}} build -d
+      - task: composer
+        vars: { CLI_ARGS: 'install' }
+      - docker compose --file {{.DOCKER_COMPOSE}} up -d --force-recreate
+
+  up:
+    silent: true
+    cmds:
+      - docker compose --file {{.DOCKER_COMPOSE}} up -d --force-recreate
+
+  down:
+    silent: true
+    cmds:
+      - docker compose --file {{.DOCKER_COMPOSE}} down
