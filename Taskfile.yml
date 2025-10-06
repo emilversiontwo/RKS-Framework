@@ -3,7 +3,8 @@
 version: '3'
 
 vars:
-  DOCKER_COMPOSE: "docker-compose.yaml"
+  DOCKER_COMPOSE: "docker-compose.local.yaml"
+  DOCKER_COMPOSE_DEPLOY: "docker-compose.deploy.yaml"
 
 tasks:
   composer:
@@ -17,10 +18,9 @@ tasks:
     silent: true
     cmds:
       - cp -n .env.example .env
-      - docker compose --file {{.DOCKER_COMPOSE}} build -d
+      - docker compose --file {{.DOCKER_COMPOSE}} up --build -d --force-recreate --remove-orphans
       - task: composer
         vars: { CLI_ARGS: 'install' }
-      - docker compose --file {{.DOCKER_COMPOSE}} up -d --force-recreate
 
   up:
     silent: true
@@ -31,3 +31,17 @@ tasks:
     silent: true
     cmds:
       - docker compose --file {{.DOCKER_COMPOSE}} down
+
+  deploy:
+    silent: true
+    cmds:
+    - task: setup
+      vars: { DOCKER_COMPOSE: '{{.DOCKER_COMPOSE_DEPLOY}}' }
+    - echo 'Project is deployed successfully'
+
+  undeploy:
+    silent: true
+    cmds:
+      - task: down
+        vars: { DOCKER_COMPOSE: '{{.DOCKER_COMPOSE_DEPLOY}}' }
+      - echo 'Project is undeploy successfully'
