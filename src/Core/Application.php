@@ -2,22 +2,25 @@
 
 namespace Src\Core;
 
+use Psr\Container\ContainerInterface;
+use RequestParseBodyException;
+
 class Application
 {
-    protected string $uri;
-
-    public Request $request;
+    public static Application $app;
+    public ContainerInterface $container;
 
     public Response $response;
-
-    public static Application $app;
-
     public Router $router;
-
     public View $view;
+    public Request $request;
+    protected string $uri;
 
-    public function __construct(){
+    public function __construct()
+    {
         self::$app = $this;
+
+        $this->container = new Container();
 
         $this->uri = $_SERVER['REQUEST_URI'];
 
@@ -30,8 +33,12 @@ class Application
         $this->view = new View(LAYOUT);
     }
 
-    public function run()
+    /**
+     * @throws RequestParseBodyException
+     */
+    public function run(): void
     {
+        $this->request->handleBodyRequest();
         echo $this->router->dispatch();
     }
 }

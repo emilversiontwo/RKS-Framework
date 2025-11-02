@@ -8,9 +8,18 @@ class View
 
     public string $content = '';
 
+    public string $title = '';
+
     public function __construct(string $layout)
     {
         $this->layout = $layout;
+    }
+
+    public function setTitle(string $title): View
+    {
+        $this->title = $title;
+
+        return $this;
     }
 
     public function render(string $view, $data = [], $layout = ''): string

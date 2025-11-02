@@ -2,9 +2,13 @@
 
 namespace Src\Core;
 
+use RequestParseBodyException;
+
 class Request
 {
     public string $uri;
+
+    public array $params;
 
     public function __construct(string $uri)
     {
@@ -50,5 +54,37 @@ class Request
         } else {
             return "";
         }
+    }
+
+    /**
+     * @throws RequestParseBodyException
+     */
+    public function handleBodyRequest(): Request
+    {
+        if (str_contains($this->uri, '?')) {
+            $parametrs = explode('?', $this->uri);
+            $parametrs = $parametrs[1];
+            $parametrs = explode('&', $parametrs);
+
+            $regexp = '/^([^=]+)=(.*)$/u';
+
+            foreach ($parametrs as $parametr) {
+                if (preg_match($regexp, $parametr, $m)) {
+                    $key = $m[1];
+                    $value = $m[2];
+                    $this->params[$key] = $value;
+                }
+            }
+
+            return $this;
+        }
+
+        if (!empty($_POST)) {
+            foreach ($_POST as $name => $value) {
+                $this->params[htmlspecialchars($name)] = htmlspecialchars($value);
+            }
+        }
+
+        return $this;
     }
 }

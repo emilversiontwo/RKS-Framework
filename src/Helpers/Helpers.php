@@ -1,5 +1,6 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
 use Src\Core\Application;
 use Src\Core\Request;
 use Src\Core\Response;
@@ -29,9 +30,10 @@ function view($view = '', $data = [], $layout = ''): string|View
     return app()->view;
 }
 
-function abort($error = '', int $code = 404)
+#[NoReturn]
+function abort($error = '', int $code = 404): void
 {
     response()->setResponseCode($code);
-    echo view("errors/{$code}", ['error' => $error], false);
+    echo view("errors/$code", ['error' => $error], false);
     die;
 }
