@@ -5,7 +5,8 @@
     "autoload": {
         "psr-4": {
             "Src\\Core\\": "src/Core/",
-            "Src\\App\\": "src/App/"
+            "Src\\App\\": "src/App/",
+            "Src\\Providers\\": "src/Providers/"
         }
     },
     "require-dev": {

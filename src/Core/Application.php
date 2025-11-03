@@ -4,6 +4,9 @@ namespace Src\Core;
 
 use Psr\Container\ContainerInterface;
 use RequestParseBodyException;
+use Src\Core\Container\Binding;
+use Src\Core\Container\Container;
+use Src\Core\Container\Enum\BindingTypeEnum;
 
 class Application
 {
@@ -39,6 +42,9 @@ class Application
     public function run(): void
     {
         $this->request->handleBodyRequest();
-        echo $this->router->dispatch();
+        $matchFunc = $this->router->dispatch();
+        require_once realpath(APP_PATH . '/Providers/Providers.php') ;
+
+        echo call_user_func($matchFunc);
     }
 }

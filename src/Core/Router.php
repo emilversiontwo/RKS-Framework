@@ -54,7 +54,7 @@ class Router
             $route['callback'][0] = new $route['callback'][0];
         }
 
-        return call_user_func($route['callback']);
+        return $route['callback'];
     }
 
     public function matchRoute(string $path): ?array
