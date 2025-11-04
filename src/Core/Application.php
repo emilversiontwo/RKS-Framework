@@ -2,11 +2,15 @@
 
 namespace Src\Core;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
+use ReflectionMethod;
 use RequestParseBodyException;
-use Src\Core\Container\Binding;
 use Src\Core\Container\Container;
-use Src\Core\Container\Enum\BindingTypeEnum;
+use Src\Core\Container\Exceptions\ContainerException;
+use Src\Core\Container\Exceptions\ServiceNotFoundException;
 
 class Application
 {
@@ -37,14 +41,30 @@ class Application
     }
 
     /**
+     * @throws ContainerException
+     * @throws ServiceNotFoundException
      * @throws RequestParseBodyException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     public function run(): void
     {
         $this->request->handleBodyRequest();
-        $matchFunc = $this->router->dispatch();
+
+        $matchController = $this->router->dispatch();
+
         require_once realpath(APP_PATH . '/Providers/Providers.php') ;
 
-        echo call_user_func($matchFunc);
+        if ($matchController['callback'] instanceof \Closure) {
+            echo $matchController['callback']();
+        }
+
+        $object = $this->container->get($matchController['callback'][0]);
+
+
+        $controllerMethod = new ReflectionMethod($object, $matchController['callback'][1]);
+
+        echo $controllerMethod->invoke($object);
     }
 }

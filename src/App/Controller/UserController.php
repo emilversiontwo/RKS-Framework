@@ -6,12 +6,12 @@ use Src\Core\Request;
 
 class UserController extends BaseController
 {
-    public function registerIndex()
+    public function registerIndex(): string
     {
         return app()->view->setTitle('Регистрация')->render('users/register', [], 'default');
     }
 
-    public function loginIndex()
+    public function loginIndex(): string
     {
         return app()->view->setTitle('Вход')->render('users/login', [], 'default');
     }
@@ -23,6 +23,6 @@ class UserController extends BaseController
 
     public function loginStore()
     {
-
+        dd($this->request);
     }
 }

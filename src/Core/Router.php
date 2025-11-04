@@ -43,18 +43,15 @@ class Router
         return $this->add($path, $callback, 'POST');
     }
 
-    public function dispatch(): mixed
+    public function dispatch(): array
     {
         $path = $this->request->getPath();
         $route = $this->matchRoute($path);
         if (!$route) {
             abort('Page not found', 404 );
         }
-        if (is_array($route['callback'])) {
-            $route['callback'][0] = new $route['callback'][0];
-        }
 
-        return $route['callback'];
+        return $route;
     }
 
     public function matchRoute(string $path): ?array

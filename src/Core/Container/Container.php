@@ -104,7 +104,7 @@ class Container implements ContainerInterface
                 if (array_key_exists($name, $parametrs)) {
                     $args[$name] = $parametrs[$name];
                 } else {
-                    $args[$name] = $this->get($type);
+                    $args[$name] = $this->get($type->getName());
                 }
             }
         }
