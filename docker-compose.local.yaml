@@ -13,7 +13,7 @@ services:
       - ./:/var/www/html
 
   db:
-    image: postgres
+    image: postgres:17
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: postgres

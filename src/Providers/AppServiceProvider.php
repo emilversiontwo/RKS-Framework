@@ -7,12 +7,26 @@ use Src\App\Controller\UserController;
 use Src\Core\Container\Binding;
 use Src\Core\Container\Enum\BindingTypeEnum;
 use Src\Core\Request;
+use Src\Core\Router\Router;
+use Src\Core\View;
 use Src\Providers\interfaces\ServiceProviderInterface;
 
 class AppServiceProvider implements ServiceProviderInterface
 {
     public function register(): void
     {
+        app()->container->set(binding: new Binding(
+            id: Router::class,
+            scope: BindingTypeEnum::SHARED,
+            arguments: [],
+            concrete: Router::class
+        ));
+        app()->container->set(binding: new Binding(
+            id: View::class,
+            scope: BindingTypeEnum::SHARED,
+            arguments: ['layout' => LAYOUT],
+            concrete: View::class
+        ));
         app()->container->set(binding: new Binding(
             id: Request::class,
             scope: BindingTypeEnum::INSTANCE,

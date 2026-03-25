@@ -41,9 +41,20 @@ class Request
         return $_GET[$name] ?? $default;
     }
 
-    public function getPath()
+    public function getPath(): string
     {
         return $this->removeQueryString();
+    }
+
+    public function getSeparatedPath(): array
+    {
+        $path = $this->removeQueryString();
+
+        if (!str_starts_with($path, '/')) {
+            $path = '/' . $path;
+        }
+
+        return array_values(array_filter(explode('/', $path)));
     }
 
     protected function removeQueryString()
@@ -56,9 +67,6 @@ class Request
         }
     }
 
-    /**
-     * @throws RequestParseBodyException
-     */
     public function handleBodyRequest(): Request
     {
         if (str_contains($this->uri, '?')) {

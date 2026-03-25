@@ -8,9 +8,12 @@ use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use ReflectionMethod;
 use RequestParseBodyException;
+use Src\App\Controller\Error\ErrorController;
 use Src\Core\Container\Container;
 use Src\Core\Container\Exceptions\ContainerException;
 use Src\Core\Container\Exceptions\ServiceNotFoundException;
+use Src\Core\Router\Router;
+use Src\Providers\interfaces\ServiceProviderInterface;
 
 class Application
 {
@@ -21,8 +24,20 @@ class Application
     public Router $router;
     public View $view;
     public Request $request;
+
+    /**
+     * @var array<ServiceProviderInterface>
+     */
+    private array $providers = [];
     protected string $uri;
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ContainerException
+     * @throws ReflectionException
+     * @throws ServiceNotFoundException
+     */
     public function __construct()
     {
         self::$app = $this;
@@ -35,9 +50,15 @@ class Application
 
         $this->response = new Response();
 
-        $this->router = new Router($this->request, $this->response);
+        require_once realpath(APP_PATH . '/Providers/Providers.php') ;
 
-        $this->view = new View(LAYOUT);
+        foreach (self::$app->providers as $provider) {
+            $provider->register();
+        };
+
+        $this->router = $this->container->get(Router::class);
+
+        $this->view = $this->container->get(View::class);
     }
 
     /**
@@ -52,19 +73,23 @@ class Application
     {
         $this->request->handleBodyRequest();
 
-        $matchController = $this->router->dispatch();
-
-        require_once realpath(APP_PATH . '/Providers/Providers.php') ;
-
-        if ($matchController['callback'] instanceof \Closure) {
-            echo $matchController['callback']();
+        $routeMatch = $this->router->dispatch();
+        //TODO call a Middlewares
+        if ($routeMatch->isClosure()) {
+            echo $routeMatch->callback->call($this, $routeMatch->params);
+        } elseif ($routeMatch->isController()){
+            $object = $this->container->get($routeMatch->callback[0]);
+            $controllerMethod = new ReflectionMethod($object, $routeMatch->callback[1]);
+            echo $controllerMethod->invoke($object, $routeMatch->params);
+        } elseif (is_string($routeMatch->callback)) {
+            echo ($routeMatch->callback)();
+        } else {
+            echo $this->container->get(ErrorController::class)->notFound();
         }
+    }
 
-        $object = $this->container->get($matchController['callback'][0]);
-
-
-        $controllerMethod = new ReflectionMethod($object, $matchController['callback'][1]);
-
-        echo $controllerMethod->invoke($object);
+    public function addProvider(ServiceProviderInterface $provider): void
+    {
+        app()->providers[] = $provider;
     }
 }

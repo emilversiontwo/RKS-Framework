@@ -35,8 +35,15 @@ class Container implements ContainerInterface
      */
     public function get($id)
     {
-        if (!$this->has($id)) {
+        if (!$this->has($id) && !class_exists($id)) {
             throw new ServiceNotFoundException('Undefined service: ' . $id);
+        } elseif (class_exists($id) && !$this->has($id)) {
+            app()->container->set(binding: new Binding(
+                id: $id,
+                scope: BindingTypeEnum::SHARED,
+                arguments: [],
+                concrete: $id
+            ));
         }
 
         $binding = $this->bindings[$id];
@@ -83,6 +90,10 @@ class Container implements ContainerInterface
     }
 
     /**
+     * @param string $id
+     * @param array $parametrs
+     * @return object
+     * @throws ContainerException
      * @throws ReflectionException
      * @throws ServiceNotFoundException
      */
