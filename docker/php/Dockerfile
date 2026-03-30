@@ -12,6 +12,8 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 
 RUN install-php-extensions pcov xdebug json mbstring xml
 
+COPY ./docker/php/php.ini-development /usr/local/etc/php/php.ini
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer

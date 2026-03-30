@@ -34,7 +34,7 @@ final readonly class RouteDispatcher
             if ($pathCount === 0 && count($route_path) === 0) {
                 return $route;
             }
-            dump($route_path, $path);
+
             for ($i = 0; $i < $pathCount; $i++) {
                 if (stripos($route_path[$i], '{') !== false || stripos($route_path[$i], '}') !== false) {
                     $param = trim($route_path[$i], '{}');

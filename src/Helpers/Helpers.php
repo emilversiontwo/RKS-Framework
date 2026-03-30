@@ -30,7 +30,6 @@ function view($view = '', $data = [], $layout = ''): string|View
     return app()->view;
 }
 
-#[NoReturn]
 function abort($error = '', int $code = 404): void
 {
     response()->setResponseCode($code);
